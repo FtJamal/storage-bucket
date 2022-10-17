@@ -11,6 +11,7 @@ function Products() {
     let [products, setProducts] = useState([]);
     let [toggleReload, setToggleReload] = useState(false);
     let [editProduct, setEditProduct] = useState(null);
+    let [fieldValue, setFieldValue] = useState([]);
     // let [loading, setLoading] = useState(false);
 
 
@@ -47,7 +48,9 @@ function Products() {
             description: '',
             price: '',
             photo: '',
-            code: ''
+            code: '',
+            productImage: `.nullable()`
+
         },
         validationSchema: yup.object({
             name: yup
@@ -62,11 +65,19 @@ function Products() {
                 .required("price is required"),
             code: yup
                 .string("code must be a string")
-                .required("code is required")
+                .required("code is required"),
+            productImage: yup
+                .array()
+                .min(1, "select at least 1 file")
 
         }),
         onSubmit: async (values) => {
             console.log(values);
+            // console.log({ 
+            //     fileName: values.file.name, 
+            //     type: values.file.type,
+            //    size: `${values.file.size} bytes`
+            //   })
 
             try {
                 let response = await axios.post(`${state.baseUrl}/product`,
@@ -85,31 +96,31 @@ function Products() {
         },
     });
 
-    let updateHandler = async (e) => {
-        e.preventDefault();
+    // let updateHandler = async (e) => {
+    //     e.preventDefault();
 
-        try {
-            let updated = await axios.put(`${state.baseUrl}/product/${editProduct?._id}`,
-                {
-                    name: editProduct.name,
-                    price: editProduct.price,
-                    description: editProduct.description,
-                    code: editProduct.code,
-                }
-                // {
-                //     withCredentials: true
-                // }
-            )
-            console.log("updated: ", updated.data);
-            setToggleReload(!toggleReload);
-            setEditProduct(null);
+    //     try {
+    //         let updated = await axios.put(`${state.baseUrl}/product/${editProduct?._id}`,
+    //             {
+    //                 name: editProduct.name,
+    //                 price: editProduct.price,
+    //                 description: editProduct.description,
+    //                 code: editProduct.code,
+    //             }
+    //             // {
+    //             //     withCredentials: true
+    //             // }
+    //         )
+    //         console.log("updated: ", updated.data);
+    //         setToggleReload(!toggleReload);
+    //         setEditProduct(null);
 
-        } catch (e) {
-            console.log("Error in api call: ", e);
-        }
+    //     } catch (e) {
+    //         console.log("Error in api call: ", e);
+    //     }
 
 
-    }
+    // }
 
     return (
         <div>
@@ -172,12 +183,30 @@ function Products() {
                         <div className="errorMessage">{formik.errors.code}</div> : null
                 }
                 <br />
+
+                <input
+                    id="productImage"
+                    name="productImage"
+                    accept="image/*"
+                    type="file"
+                    value={formik.values.productImage}
+                    // onChange={formik.handleChange}
+                    onChange={(event) => {
+                        setFieldValue("file", event.currentTarget.files[0]);
+                    }}
+                />
+                {
+                    (formik.touched.productImage && formik.errors.productImage) ?
+                        <div className="errorMessage">{formik.errors.productImage}</div> : null
+                }
+                <br />
+
                 <button type="submit">
                     Submit
                 </button>
             </form>
 
-            <hr />
+            {/* <hr />
 
             {(editProduct !== null) ? (<div>
 
@@ -192,7 +221,7 @@ function Products() {
                 </form>
             </div>) : null}
 
-            <hr />
+            <hr /> */}
 
             <div>
                 {products?.map(eachProduct => (
@@ -203,8 +232,10 @@ function Products() {
                         <div>{eachProduct?.price}</div>
                         <div>{eachProduct?.description}</div>
                         <div>{eachProduct?.code}</div>
+                        <img width="100px" src={eachProduct?.productImage} alt="" />
 
-                        <button onClick={async () => {
+                        {/* <img src={URL.createObjectURL(FILE_OBJECT)} />   */}
+                        {/* <button onClick={async () => {
                             try {
                                 let deleted = await axios.delete(`${state.baseUrl}/product/${eachProduct?._id}`,
 
@@ -230,7 +261,7 @@ function Products() {
                                 description: eachProduct?.description,
                                 code: eachProduct?.code
                             })
-                        }}>Edit</button>
+                        }}>Edit</button> */}
 
                     </div>
                 ))

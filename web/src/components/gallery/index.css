@@ -1,0 +1,29 @@
+.productsListDiv {
+    display: flex;
+    flex-wrap: wrap;
+    width: 120px;
+    /* flex-direction: row; */
+    /* align-items: row; */
+}
+
+.productsListDiv>div {
+
+    border: 1px solid black;
+    width: 130px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    font-family: Verdana, sans-serif;
+}
+
+.productsListDiv>div:hover {
+    box-shadow: 0px 0px 10px black;
+}
+
+.delete,
+.edit {
+    color: red;
+    border-color: red;
+    border-radius: 5px;
+    margin: 1px;
+}

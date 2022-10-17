@@ -75,7 +75,8 @@ const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
     price: { type: String, required: true },
-    code: { type: String, required: true },
+    // code: { type: String, required: true },
+    productImage: { type: String, required: true },
 
     createdOn: { type: Date, default: Date.now }
 });
@@ -345,29 +346,71 @@ app.get("/users", async (req, res) => {
 
 // 
 
-app.post("/product", async (req, res) => {
+app.post("/product", upload.any(), (req, res) => {
 
     console.log("product received: ", req.body);
 
-    let newProduct = new productModel({
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        code: req.body.code,
-    })
-    try {
-        let response = await newProduct.save()
-        console.log("product added: ", response);
+    console.log("file: ", req.files[0]);
 
-        res.send({
-            message: "product added",
-            data: response
-        });
-    } catch (error) {
-        res.status(500).send({
-            message: "failed to add product"
-        });
-    }
+    // https://googleapis.dev/nodejs/storage/latest/Bucket.html#upload-examples
+    bucket.upload(
+        req.files[0].path,
+        {
+            destination: `productImages/${req.files[0].filename}`, // give destination name if you want to give a certain name to file in bucket, include date to make name unique otherwise it will replace previous file with the same name
+        },
+        function (err, file, apiResponse) {
+            if (!err) {
+                // console.log("api resp: ", apiResponse);
+
+                // https://googleapis.dev/nodejs/storage/latest/Bucket.html#getSignedUrl
+                file.getSignedUrl({
+                    action: 'read',
+                    expires: '03-09-2491'
+                }).then((urlData, err) => {
+                    if (!err) {
+                        console.log("public downloadable url: ", urlData[0]) // this is public downloadable url 
+
+                        // delete file from folder before sending response back to client (optional but recommended)
+                        // optional because it is gonna delete automatically sooner or later
+                        // recommended because you may run out of space if you dont do so, and if your files are sensitive it is simply not safe in server folder
+                        try {
+                            fs.unlinkSync(req.files[0].path)
+                            //file removed
+                        } catch (err) {
+                            console.error(err)
+                        }
+
+
+                        let newProduct = new productModel({
+                            name: req.body.name,
+                            description: req.body.description,
+                            price: req.body.price,
+                            // code: req.body.code,
+                            productImage: urlData[0],
+                        })
+                        try {
+                            let response = newProduct.save()
+                            console.log("product added: ", response);
+
+                            res.send({
+                                message: "product added",
+                                data: {
+                                    name: req.body.name,
+                                    description: req.body.description,
+                                    price: req.body.price,
+                                    // code: req.body.code,
+                                    productImage: urlData[0],
+                                }
+                            });
+                        } catch (error) {
+                            res.status(500).send({
+                                message: "failed to add product"
+                            });
+                        }
+                    }
+                })
+            }
+        })
 })
 
 app.get("/products", async (req, res) => {
@@ -487,4 +530,4 @@ process.on('SIGINT', function () {/////this function will run jst before app is 
         process.exit(0);
     });
 });
-////////////////mongodb connected disconnected events///////////////////////////////////////////////
+////////////////mongodb connected disconnected events//////////////////////////////////////////////

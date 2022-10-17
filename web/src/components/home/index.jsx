@@ -68,7 +68,7 @@ let Home = () => {
 
                 Profile Picture: <input type="file" id="profilePictureInput" accept='image/*'
                     onChange={() => {
-                        ////// to display imager instantly on screen
+                        ////// to display images instantly on screen
                         var profilePictureInput = document.getElementById("profilePictureInput");
                         var url = URL.createObjectURL(profilePictureInput.files[0])
                         console.log("url: ", url);
@@ -88,9 +88,10 @@ let Home = () => {
             <div>
                 {users.map(eachUser => (
                     <div key={eachUser.id}>
-                        <span>{eachUser.name}</span>
-                        <span>{eachUser.email}</span>
+                        <h4>Name:{eachUser.name}</h4>
+                        <h6>Email: {eachUser.email}</h6>
                         <img width="100px" src={eachUser.profilePicture} alt="" />
+                        <br/>
                     </div>
                 ))}
             </div>
