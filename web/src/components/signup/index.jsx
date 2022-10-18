@@ -16,7 +16,7 @@ let Signup = () => {
     useEffect(() => {
 
         let getAllUsers = async () => {
-            let response = await axios.get(`${state.baseUrl}/users`);
+            let response = await axios.get("https://repulsive-threads-fawn.cyclic.app/signup");
             setUsers(response.data.data)
         }
         getAllUsers();
