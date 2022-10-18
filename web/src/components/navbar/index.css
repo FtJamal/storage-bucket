@@ -1,5 +1,6 @@
 .nav {
-    background-color: #0d6efd;
+    /* background-color: #0d6efd; */
+    background-color: rgba(121, 46, 150, 0.746);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -28,7 +29,7 @@
 .nav>ul>li>a {
     text-decoration: none;
     /* color: white; */
-    color: rgba(121, 46, 150, 0.746);
+   color: #0d6efd;
 }
 .nav .userName{
     color: aliceblue;
