@@ -48,7 +48,10 @@ var upload = multer({ storage: storageConfig })
 
 const app = express();
 app.use(express.json());  // parsing body
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://storagebucket.netlify.app', "*"],
+    // credentials: true
+}));
 
 
 const port = process.env.PORT || 5001;
