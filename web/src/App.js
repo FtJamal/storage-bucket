@@ -1,9 +1,8 @@
-import Home from "./components/home";
+// import Home from "./components/home";
 import Products from "./components/products";
-import About from "./components/about";
-import Gallery from "./components/gallery";
+// import About from "./components/about";
 import Login from "./components/login";
-// import Signup from "./components/signup";
+import Signup from "./components/signup";
 import NavBar from "./components/navbar";
 
 import './App.css';
@@ -28,12 +27,11 @@ function App() {
         <Routes>
 
           <Route path="/login" element={<Login />} />
-          {/* <Route path="/signup" element={<Signup />} /> */}
+          <Route path="/signup" element={<Signup />} />
 
-          <Route path="/about" element={<About />} />
-          <Route path="/gallery" element={<Gallery />} />
+          {/* <Route path="/about" element={<About />} /> */}
           <Route path="/products" element={<Products />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Signup />} />
 
         </Routes>
     

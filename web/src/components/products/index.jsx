@@ -1,19 +1,18 @@
-import axios from "axios";
-import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from '../../context/Context';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
+import { useContext, useEffect, useState } from "react";
+import axios from 'axios';
+import "./index.css"
 
 
-function Products() {
+let Products = () => {
 
     let { state, dispatch } = useContext(GlobalContext);
+    const [Name, setName] = useState("")
+    const [Description, setDescription] = useState("")
+    const [Price, setPrice] = useState("")
     let [products, setProducts] = useState([]);
     let [toggleReload, setToggleReload] = useState(false);
-    let [editProduct, setEditProduct] = useState(null);
-    let [fieldValue, setFieldValue] = useState([]);
-    // let [loading, setLoading] = useState(false);
-
+    let [editProduct, setEditProduct] = useState(null)
 
     useEffect(() => {
 
@@ -41,172 +40,89 @@ function Products() {
 
     }, [toggleReload])
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
 
-    const formik = useFormik({
-        initialValues: {
-            name: '',
-            description: '',
-            price: '',
-            photo: '',
-            code: '',
-            productImage: `.nullable()`
+        let productImage = document.getElementById("productImage");
+        console.log("fileInput: ", productImage.files);
 
-        },
-        validationSchema: yup.object({
-            name: yup
-                .string('enter your product name')
-                .min(3, "product name is too short")
-                .required('product name is required'),
-            description: yup
-                .string('Enter your description'),
-            price: yup
-                .number('Enter a number')
-                .moreThan(0, "price can not be zero")
-                .required("price is required"),
-            code: yup
-                .string("code must be a string")
-                .required("code is required"),
-            productImage: yup
-                .array()
-                .min(1, "select at least 1 file")
+        let formData = new FormData();
+        // https://developer.mozilla.org/en-US/docs/Web/API/FormData/append#syntax
 
-        }),
-        onSubmit: async (values) => {
-            console.log(values);
-            // console.log({ 
-            //     fileName: values.file.name, 
-            //     type: values.file.type,
-            //    size: `${values.file.size} bytes`
-            //   })
 
-            try {
-                let response = await axios.post(`${state.baseUrl}/product`,
-                    values,
-                    // {
-                    //     withCredentials: true
-                    // }
-                )
-                console.log("response: ", response.data);
+        formData.append("name", Name); // this is how you add some text data along with file
+        formData.append("description", Description); // this is how you add some text data along with file
+        formData.append("price", Price); // this is how you add some text data along with file
+        formData.append("productImage", productImage.files[0]); // file input is for browser only, use fs to read file in nodejs client
+
+        axios({
+            method: 'post',
+            url: `${state.baseUrl}/product`,
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data' },
+            // withCredentials: true
+        })
+            .then(res => {
+                console.log(`upload Success` + res.data);
                 setToggleReload(!toggleReload)
+            })
+            .catch(err => {
+                console.log(err);
+            })
 
-            } catch (e) {
-                console.log("Error in api call: ", e);
-            }
+    }
 
-        },
-    });
+    let updateHandler = async (e) => {
+        e.preventDefault();
 
-    // let updateHandler = async (e) => {
-    //     e.preventDefault();
+        try {
+            let updated = await axios.put(`${state.baseUrl}/product/${editProduct?._id}`,
+                {
+                    name: editProduct.name,
+                    price: editProduct.price,
+                    description: editProduct.description,
+                    code: editProduct.code,
+                }
+                // {
+                //     withCredentials: true
+                // }
+            )
+            console.log("updated: ", updated.data);
+            setToggleReload(!toggleReload);
+            setEditProduct(null);
 
-    //     try {
-    //         let updated = await axios.put(`${state.baseUrl}/product/${editProduct?._id}`,
-    //             {
-    //                 name: editProduct.name,
-    //                 price: editProduct.price,
-    //                 description: editProduct.description,
-    //                 code: editProduct.code,
-    //             }
-    //             // {
-    //             //     withCredentials: true
-    //             // }
-    //         )
-    //         console.log("updated: ", updated.data);
-    //         setToggleReload(!toggleReload);
-    //         setEditProduct(null);
+        } catch (e) {
+            console.log("Error in api call: ", e);
+        }
 
-    //     } catch (e) {
-    //         console.log("Error in api call: ", e);
-    //     }
-
-
-    // }
+    }
 
     return (
         <div>
-
-            <h1>Products Page!</h1>
-
-            <form onSubmit={formik.handleSubmit}>
-                <input
-                    id="name"
-                    name="name"
-                    placeholder="Name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-
-                />
-                {
-                    (formik.touched.name && formik.errors.name) ?
-                        <div className="errorMessage">{formik.errors.name}</div> : null
-                }
+            <h1>Form</h1>
+            <form onSubmit={handleSubmit}>
+                Name: <input type="text" name='name' placeholder='name' id='name' onChange={(e) => { setName(e.target.value) }} />
                 <br />
-                <input
-                    id="description"
-                    name="description"
-                    placeholder="Description"
-                    type="text"
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-
-                />
-                {
-                    (formik.touched.description && formik.errors.description) ?
-                        <div className="errorMessage">{formik.errors.description}</div> : null
-                }
+                Description: <input type="text" name='description' placeholder='description' id='description' onChange={(e) => { setDescription(e.target.value) }} />
                 <br />
-                <input
-                    id="price"
-                    name="price"
-                    placeholder="Price"
-                    type="number"
-                    value={formik.values.price}
-                    onChange={formik.handleChange}
-
-                />
-                {
-                    (formik.touched.price && formik.errors.price) ?
-                        <div className="errorMessage">{formik.errors.price}</div> : null
-                }
+                Price: <input type="number" name='price' placeholder='price' id='price' onChange={(e) => { setPrice(e.target.value) }} />
                 <br />
-                <input
-                    id="code"
-                    name="code"
-                    placeholder="Code"
-                    type="text"
-                    value={formik.values.code}
-                    onChange={formik.handleChange}
+                Product Image: <input type="file" name='productImage' id='productImage' accept='image/*'
+                    onChange={() => {
+                        //// to display images instantly on screen
+                        var productImage = document.getElementById("productImage");
+                        var url = URL.createObjectURL(productImage.files[0])
+                        console.log("url: ", url);
+                        document.getElementById("img").innerHTML = `<img width="200px" src="${url}" alt="" id="img"> `
+                    }} />
 
-                />
-                {
-                    (formik.touched.code && formik.errors.code) ?
-                        <div className="errorMessage">{formik.errors.code}</div> : null
-                }
+                <div id="img"></div>
                 <br />
 
-                <input
-                    id="productImage"
-                    name="productImage"
-                    accept="image/*"
-                    type="file"
-                    value={formik.values.productImage}
-                    // onChange={formik.handleChange}
-                    onChange={(event) => {
-                        setFieldValue("file", event.currentTarget.files[0]);
-                    }}
-                />
-                {
-                    (formik.touched.productImage && formik.errors.productImage) ?
-                        <div className="errorMessage">{formik.errors.productImage}</div> : null
-                }
-                <br />
-
-                <button type="submit">
-                    Submit
-                </button>
+                <button type='submit'>Submit</button>
             </form>
 
-            {/* <hr />
+            <hr />
 
             {(editProduct !== null) ? (<div>
 
@@ -221,58 +137,58 @@ function Products() {
                 </form>
             </div>) : null}
 
-            <hr /> */}
+            <hr />
 
-            <div>
+
+            <h1 className='header'>Kids_Wishh </h1>
+            <div className='main'>
                 {products?.map(eachProduct => (
+                    <div className='productsListDiv' key={eachProduct?._id}>
+                        <div className='product'>
+                            <div>
+                                <img width="100px" src={eachProduct?.productImage} alt="" />
+                                <div><b>{eachProduct?.name}</b></div>
+                                <div>{eachProduct?.description}</div>
+                                <div>{eachProduct?.price}</div>
 
-                    <div key={eachProduct?._id}>
+                                <br />
 
-                        <h3>{eachProduct?.name}</h3>
-                        <div>{eachProduct?.price}</div>
-                        <div>{eachProduct?.description}</div>
-                        <div>{eachProduct?.code}</div>
-                        <img width="100px" src={eachProduct?.productImage} alt="" />
+                                <button className='delete' onClick={async () => {
+                                    try {
+                                        let deleted = await axios.delete(`${state.baseUrl}/product/${eachProduct?._id}`,
 
-                        {/* <img src={URL.createObjectURL(FILE_OBJECT)} />   */}
-                        {/* <button onClick={async () => {
-                            try {
-                                let deleted = await axios.delete(`${state.baseUrl}/product/${eachProduct?._id}`,
+                                            // {
+                                            //     withCredentials: true
+                                            // }
+                                        )
+                                        console.log("deleted: ", deleted.data);
+                                        setToggleReload(!toggleReload)
 
-                                    // {
-                                    //     withCredentials: true
-                                    // }
-                                )
-                                console.log("deleted: ", deleted.data);
-                                setToggleReload(!toggleReload)
+                                    } catch (e) {
+                                        console.log("Error in api call: ", e);
+                                    }
 
-                            } catch (e) {
-                                console.log("Error in api call: ", e);
-                            }
-
-                        }}>Delete</button>
+                                }}>Delete</button>
 
 
-                        <button onClick={() => {
-                            setEditProduct({
-                                _id: eachProduct._id,
-                                name: eachProduct?.name,
-                                price: eachProduct?.price,
-                                description: eachProduct?.description,
-                                code: eachProduct?.code
-                            })
-                        }}>Edit</button> */}
-
+                                <button className='edit' onClick={() => {
+                                    setEditProduct({
+                                        _id: eachProduct._id,
+                                        name: eachProduct?.name,
+                                        price: eachProduct?.price,
+                                        description: eachProduct?.description,
+                                        code: eachProduct?.code
+                                    })
+                                }}>Edit</button>
+                            </div>
+                        </div>
                     </div>
                 ))
                 }
             </div>
 
         </div>
-    );
-
-
-
+    )
 }
 
 export default Products;
