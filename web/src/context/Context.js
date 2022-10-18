@@ -7,7 +7,9 @@ let data = {
   user: {},
   darkTheme: true,
   myNum : 5,
-  baseUrl: (window.location.href.indexOf("https") === -1) ? "http://localhost:5001" : "https://repulsive-threads-fawn.cyclic.app"
+  baseUrl: (window.location.href.indexOf("https") === -1) ? "http://localhost:5001" :
+  //  "https://repulsive-threads-fawn.cyclic.app"
+  "null"
 }
 
 export default function ContextProvider({ children }) {
