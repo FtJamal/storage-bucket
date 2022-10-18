@@ -43,7 +43,8 @@ let Signup = () => {
 
         axios({
             method: 'post',
-            url: `${state.baseUrl}/signup`,
+            // url: `${state.baseUrl}/signup`,
+            url: "https://repulsive-threads-fawn.cyclic.app/signup",
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' },
             // withCredentials: true
