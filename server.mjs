@@ -49,7 +49,7 @@ var upload = multer({ storage: storageConfig })
 const app = express();
 app.use(express.json());  // parsing body
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://storagebucket.netlify.app', "*"],
+    origin: ['http://localhost:3000', 'https://storagebucket.netlify.app', "https://signup-4439c.firebaseio.com","*"],
     // credentials: true
 }));
 
