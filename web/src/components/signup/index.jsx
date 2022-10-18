@@ -16,7 +16,7 @@ let Signup = () => {
     useEffect(() => {
 
         let getAllUsers = async () => {
-            let response = await axios.get("https://repulsive-threads-fawn.cyclic.app/signup");
+            let response = await axios.get("http://localhost:5001/users");
             setUsers(response.data.data)
         }
         getAllUsers();
@@ -44,7 +44,7 @@ let Signup = () => {
         axios({
             method: 'post',
             // url: `${state.baseUrl}/signup`,
-            url: "https://repulsive-threads-fawn.cyclic.app/signup",
+            url: "http://localhost:5001/signup",
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' },
             // withCredentials: true
