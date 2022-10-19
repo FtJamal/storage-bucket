@@ -16,7 +16,7 @@ let Signup = () => {
     useEffect(() => {
 
         let getAllUsers = async () => {
-            let response = await axios.get("http://localhost:5001/users");
+            let response = await axios.get(`${state.baseUrl}/users`);
             setUsers(response.data.data)
         }
         getAllUsers();
@@ -43,8 +43,8 @@ let Signup = () => {
 
         axios({
             method: 'post',
-            // url: `${state.baseUrl}/signup`,
-            url: "http://localhost:5001/signup",
+            url: `${state.baseUrl}/signup`,
+            // url: "http://localhost:5001/signup",
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' },
             // withCredentials: true
